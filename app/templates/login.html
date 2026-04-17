@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Login - sifr notes{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-box">
+        <h1 class="login-title">sifr notes</h1>
+
+        {% if error %}
+        <p class="login-error">{{ error }}</p>
+        {% endif %}
+
+        <form class="login-form" method="post" action="/auth/login">
+            <div class="field">
+                <label for="username">Username</label>
+                <input
+                    id="username"
+                    type="text"
+                    name="username"
+                    autocomplete="username"
+                    autofocus
+                    required
+                />
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <input
+                id="password"
+                type="password"
+                name="password"
+                autocomplete="current-password"
+                required
+                />
+            </div>
+
+            <button type="submit">Sign in</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

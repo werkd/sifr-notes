@@ -70,4 +70,4 @@ async def get_current_user(
     if user is None:
         raise NotAuthenticatedException()
     
-    return User
+    return user # It was User before; a stupid typo

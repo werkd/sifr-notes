@@ -36,7 +36,7 @@ class Note(Base):
     user = Relationship("User", back_populates="notes")
     note_tags = Relationship("NoteTag", back_populates="note", cascade="all, delete-orphan")
     tags = Relationship("Tag", secondary="note_tags", back_populates="notes", viewonly=True)
-    
+
 
 class Tag(Base):
     __tablename__ = "tags"

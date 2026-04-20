@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% set active_page = "notes" %}
+
+{% block title %}{{ note.title }} - sifr {% endblock %}
+
+{% block content %}
+
+<div class="note-detail-header">
+    <div class="note-detail-header-main">
+        <h1 class="note-detail-title">{{ note.title }}</h1>
+    
+        <div class="note-detail-meta">
+            <span>created {{ note.created_at.strftime("%d %b %Y") }}</span>
+            {% if note.updated_at != note.created_at %}
+                <span>· edited {{ note.created_at.strftime("%d %b %Y") }}</span>
+            {% endif %}
+
+            {% if note.tags %}
+                <div class="note-tags">
+                    {% for tag in note.tags %}
+                        <span class="tag-pill"> {{ tag.name }} </span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+
+    <div class="note-detail-actions">
+        <a href="/notes/{{ note.id }}/edit" class="btn btn-ghost">edit</a>
+
+        <form action="/notes/{{ note.id }}/delete" method="post"
+        onsubmit="return confirm('delete this note?')">
+            <button type="submit" class="btn btn-danger">delete</button>
+        </form>
+    </div>
+</div>
+
+<div class="prose">
+    {{ note.body_rendered | safe }}
+</div>
+
+{% endblock %}

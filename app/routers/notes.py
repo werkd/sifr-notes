@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.auth import get_current_user
 from app.database import get_db
@@ -22,9 +23,11 @@ def render_markdown(raw: str) -> str:
     return md.markdown(raw, extensions=MD_EXTENSIONS)
 
 
-async def _get_note_or_404(note_id:int, user: User, db: AsyncSession) -> Note:
+async def _get_note_or_404(note_id: int, user: User, db: AsyncSession) -> Note:
     result = await db.execute(
-        select(Note).where(Note.id==note_id, Note.user_id==user.id)
+        select(Note)
+        .where(Note.id == note_id, Note.user_id == user.id)
+        .options(selectinload(Note.tags))
     )
     note = result.scalar_one_or_none()
     if note is None:
@@ -39,8 +42,14 @@ async def list_notes(
         user: User = Depends(get_current_user),
 ):
     result = await db.execute(
-        select(Note).where(Note.user_id==user.id).order_by(Note.updated_at.desc())
+        select(Note)
+        .where(Note.user_id == user.id)
+        .order_by(Note.updated_at.desc())
+        .options(selectinload(Note.tags))
     )
+    # result = await db.execute(
+    #     select(Note).where(Note.user_id==user.id).order_by(Note.updated_at.desc())
+    # )
     notes = result.scalars().all()
     return templates.TemplateResponse(
         request, 
@@ -58,7 +67,9 @@ async def note_detail(
 ):
     note = await _get_note_or_404(note_id, user, db)
     return templates.TemplateResponse(
-        request, "notes/detail.html",{"note":note, "user": user},
+        request, 
+        "notes/detail.html",
+        {"note":note, "user": user},
     )
 
 # POST /notes CREATE
@@ -78,6 +89,7 @@ async def create_note(
     db.add(note)
     await db.commit()
     await db.refresh(note)
+    print(f"Note created with ID: {note.id}")
     return RedirectResponse(url=f"/notes/{note.id}", status_code=303)
 
 

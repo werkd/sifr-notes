@@ -1,0 +1,20 @@
+<a href="/notes/{{ note.id }}" class="note-card">
+    <div class="note-card-title"> {{ note.title }}</div>
+
+    {% if note.body_rendered %}
+        <div class="note-card-preview">
+            {{ note.body_rendered | striptags | truncate(140, end="...") }}
+        </div>
+    {% endif %}
+
+    <div class="note-card-meta">
+        <span class="note-card-date"> {{note.updated_at.strftime("%d %b %Y")}} </span>
+        {% if note.tags %}
+            <div class="note-tags">
+                {% for tag in note.tags %}
+                    <span class="tag-pill"> {{ tag.name }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</a>

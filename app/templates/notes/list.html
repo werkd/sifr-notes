@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% set active_page = "notes" %}
+
+{% block title %}all notes - sifr {% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1 class="page-title">all notes</h1>
+        <a href="/notes/new" class="btn btn-primary">+ new note</a>
+    </div>
+
+    <div class="page-body">
+        {# TODO: Search functionality #}
+        <input 
+            type="search"
+            name="q"
+            class="search-input"
+            placeholder="search notes..."
+            style="margin-bottom: 1.5rem;"
+            hx-get="/notes/search"
+            hx-target="#notes-list"
+            hx-indicator="#search-spinner"
+        />
+        <span id="search-spinner" class="htmx-indicator" style="font-size:0.8rem; color:var(--text-dim);">
+            searching...
+        </span>
+
+        <div id="notes-list" class="notes-grid">
+            {% if notes %}
+                {% for note in notes %}
+                    {% include "notes/_note_card.html" %}
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">◈</div>
+                        <p class="empty-state-text">no notes yet.</p>
+                        <a href="/notes/new" class="btn-btn-ghost">write something</a>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+{% endblock %}

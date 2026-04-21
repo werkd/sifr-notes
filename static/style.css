@@ -23,6 +23,7 @@
     --sidebar-width: 224px;
     --radius: 6px;
     --radius-em: 4px;
+    --radius-sm: 4px;
     --font-display: 'Cormorant Garamond', Georgia, serif;
     --font-ui: 'Atkinson Hyperlegible', system-ui, sans-serif;
     --font-mono: 'Courier new', monospace;
@@ -87,7 +88,7 @@ a:hover{
 }
 
 .brand {
-    font-family: var(--font_display);
+    font-family: var(--font-display);
     font-size: 1.375rem;
     font-weight: 500;
     color: var(--accent);
@@ -101,7 +102,7 @@ a:hover{
     color: var(--accent-hover);
 }
 
-brand-mark{
+.brand-mark{
     font-size:0.85em;
     opacity:0.75;
 }
@@ -142,7 +143,7 @@ brand-mark{
     background: var(--surface-raised);
     }
 
-.nav-link.active {
+.nav-link:active {
     color: var(--accent);
     background: var(--accent-dim);
 }
@@ -206,7 +207,7 @@ brand-mark{
     letter-spacing: -0.01em;
     }
 
-page-body {
+.page-body {
     padding: 2rem 2.5rem;
     flex: 1;
 }
@@ -305,7 +306,7 @@ page-body {
     transition: border-color 0.15s, background 0.15s;
  }
 
- .note-card.hover {
+ .note-card:hover {
     border-color: var(--accent-dim);
     background: var(--surface-raised);
     color: inherit;
@@ -323,7 +324,7 @@ page-body {
 
  .note-card-preview {
     font-size: 0.8125rem;
-    color: var(--text-muited);
+    color: var(--text-muted);
     line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -444,7 +445,7 @@ page-body {
     margin: 0 0 1.25em;
 }
 
-.prose u1, .prose ol {
+.prose ul, .prose ol {
     padding-left: 1.5rem;
     margin: 0 0 1.25em;
 

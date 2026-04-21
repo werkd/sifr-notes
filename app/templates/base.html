@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{% block title %}sifr notes{% endblock %}</title>
         <link rel="stylesheet" href="/static/style.css" />
-        <script scr="https://unpkg.com/htmx.org@1.9.12" defer></script>
+        <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
     </head>
 
     <body>
@@ -13,7 +13,7 @@
             <!-- Sidebar Section -->
             <aside class="sidebar">
                 <div class="sidebar-header">
-                    <a href="/notes class="brand">
+                    <a href="/notes" class="brand">
                         <span class="brand-mark">◈</span> sifr <!-- lozenge / diamond -->
                     </a>
                 </div>
@@ -25,7 +25,7 @@
 
                 <!-- Tags section -->
                     {% if tags %}
-                        <span clas="nav-section-label">tags</span>
+                        <span class="nav-section-label">tags</span>
                         {% for tag in tags %}
                             <a href="/notes?tag={{ tag.name }}" class="nav-link {% if active_tag == tag.name %}active {% endif %}">
                                 <span class="nav-icon">#</span> {{ tag.name }}

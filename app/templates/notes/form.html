@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if note %}Edit - {{ note.title }} 
+    {% else %} New Note {% endif %} · sifr
+{% endblock %}
+
+{% block content %}
+<div class="note-form-view">
+
+    <div class="view-header">
+        <h1 class="view-title">
+            {% if note %}edit note
+            {% else %}new note {% endif %}
+        </h1>
+        <a href="{% if note %}/notes/{{ note.id }} {% else %}/notes{% endif %}"
+            class="btn btn-ghost">
+            ✕ cancel
+        </a>
+    </div>
+
+    <form
+        action="{% if note %}/notes/{{ note.id }}/edit{% else %}/notes/{% endif %}"
+        method="post"
+        class="note-form"
+    >
+        <div class="form-group">
+            <label for="title" class="form-label">title</label>
+            <input
+                id="title"
+                name="title"
+                type="text"
+                class="form-input"
+                placeholder="untitled"
+                value="{{ note.title  if note else '' }}"
+                required
+                autofocus
+            />
+        </div>
+
+        <div class="form-group">
+            <label for="body" class="form-label">body <span class="form-hint">markdown</span></label>
+            <textarea
+                id="body"
+                name="body"
+                class="form-textarea"
+                placeholder="Write in markdown..."
+                rows="20"
+                required
+            >{{ note.body if note else '' }}</textarea>
+        </div>
+
+        <div class="form-group"
+            <label for="tags" class="form-label">tags <span class="form-hint">comma-separated</span></label>
+            <input
+                id="tags"
+                name="tags"
+                type="text"
+                class="form-input"
+                placeholder="e.g. python, ideas, reading"
+                value="{% if note %}{% for tag in note.tags %}{{ tag.name }}{% if not loop.last %}, {% endif %} {% endfor %} {% endif %}"
+                />
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+            {% if note %}save changes {% else %}create note {% endif %}
+        </button>
+    </div>
+</form>
+
+</div>
+
+{% endblock %}

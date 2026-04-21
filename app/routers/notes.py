@@ -19,6 +19,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 MD_EXTENSIONS = ["fenced_code", "tables", "nl2br"]
 
+
 def render_markdown(raw: str) -> str:
     return md.markdown(raw, extensions=MD_EXTENSIONS)
 
@@ -56,6 +57,21 @@ async def list_notes(
         "notes/list.html",
         {"notes": notes, "user": user},
     )
+
+
+
+# GET /notes/new - empty create form
+@router.get("/new", response_class=HTMLResponse)
+async def new_note_forM(
+    request: Request,
+    user: User = Depends(get_current_user),
+):
+    return templates.TemplateResponse(
+        request,
+        "notes/form.html",
+        {"user": user},
+    )
+
 
 # GET /notes{note_id} DETAIL
 @router.get("/{note_id}", response_class=HTMLResponse)
@@ -122,6 +138,22 @@ async def delete_note(
     await db.commit()
     return RedirectResponse(url="/notes/", status_code=303)
 
+
+
+# GET /{notes_id}/edit - fetch and render form to edit
+@router.get("/{note_id}/edit",response_class=HTMLResponse)
+async def edit_note_form(
+    note_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    note = await _get_note_or_404(note_id, user, db)
+    return templates.TemplateResponse(
+        request,
+        name="notes/form.html",
+        context={"note": note, "user": user},
+    )
 
 
 # @router.get("/")

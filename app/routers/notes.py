@@ -62,7 +62,7 @@ async def list_notes(
 
 # GET /notes/new - empty create form
 @router.get("/new", response_class=HTMLResponse)
-async def new_note_forM(
+async def new_note_form(
     request: Request,
     user: User = Depends(get_current_user),
 ):

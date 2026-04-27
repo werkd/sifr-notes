@@ -5,13 +5,14 @@ import markdown as md
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import select
+from sqlalchemy import select, delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.auth import get_current_user
 from app.database import get_db
-from app.models import Note, User
+from app.models import Note, NoteTag, Tag, User
+from app.utils import parse_tags
 
 
 router = APIRouter(tags=["notes"])
@@ -35,6 +36,25 @@ async def _get_note_or_404(note_id: int, user: User, db: AsyncSession) -> Note:
         raise HTTPException(status_code=404, detail="Note not found. ")
     return note
 
+
+async def sync_tags(note_id: int, tag_names: list[str], user_id: int, db: AsyncSession) -> None:
+    """Replace all tags on a note. Deletes existing onces and inserts fresh NoteTag rows."""
+    await db.execute(sa_delete(NoteTag)
+                     .where(NoteTag.note_id == note_id))
+    for name in tag_names:
+        result = await db.execute(
+            select(Tag)
+            .where(Tag.name == name, Tag.user_id == user_id)
+        )
+        tag = result.scalar_one_or_none()
+        if tag is None:
+            tag = Tag(name=name, user_id=user_id)
+            db.add(tag)
+            await db.flush()
+
+        db.add(NoteTag(note_id=note_id, tag_id=tag.id))
+
+
 # GET /notes LIST
 @router.get("/", response_class=HTMLResponse)
 async def list_notes(
@@ -52,10 +72,18 @@ async def list_notes(
     #     select(Note).where(Note.user_id==user.id).order_by(Note.updated_at.desc())
     # )
     notes = result.scalars().all()
+
+    tags_result = await db.execute(
+        select(Tag)
+        .where(Tag.user_id == user.id)
+        .order_by(Tag.name)
+    )
+    all_tags = tags_result.scalars().all()
+
     return templates.TemplateResponse(
-        request, 
+        request,
         "notes/list.html",
-        {"notes": notes, "user": user},
+        {"notes": notes, "user": user, "all_tags": all_tags},
     )
 
 
@@ -83,16 +111,17 @@ async def note_detail(
 ):
     note = await _get_note_or_404(note_id, user, db)
     return templates.TemplateResponse(
-        request, 
+        request,
         "notes/detail.html",
-        {"note":note, "user": user},
+        {"note": note, "user": user},
     )
 
 # POST /notes CREATE
 @router.post("/", response_class=HTMLResponse)
 async def create_note(
-    title: str=Form(...),
-    body: str=Form(...),
+    title: str = Form(...),
+    body: str = Form(...),
+    tags: str = Form(default=""),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
     ):
@@ -103,9 +132,13 @@ async def create_note(
         user_id=user.id,
     )
     db.add(note)
+    await db.flush()
+
+    tag_names = parse_tags(tags)
+    if tag_names:
+        await sync_tags(note.id, tag_names, user.id, db)
+
     await db.commit()
-    await db.refresh(note)
-    print(f"Note created with ID: {note.id}")
     return RedirectResponse(url=f"/notes/{note.id}", status_code=303)
 
 
@@ -115,6 +148,7 @@ async def edit_note(
         note_id: int,
         title: str = Form(...),
         body: str = Form(...),
+        tags: str = Form(default=""),
         db: AsyncSession = Depends(get_db),
         user: User = Depends(get_current_user),
 ):
@@ -122,8 +156,10 @@ async def edit_note(
     note.title = title
     note.body = body
     note.body_rendered = render_markdown(body)
+
+    await sync_tags(note.id, parse_tags(tags), user.id, db)
+
     await db.commit()
-    await db.refresh(note)
     return RedirectResponse(url=f"/notes/{note.id}", status_code=303)
 
 # POST /notes/{note_id}/delete

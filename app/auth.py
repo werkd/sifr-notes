@@ -47,7 +47,6 @@ def decode_session_token(token: str) -> int:
 
 
 # dependency for auth
-
 class NotAuthenticatedException(Exception):
     """Raised by get_current_user when no valid session exists. """
     pass
@@ -60,14 +59,14 @@ async def get_current_user(
     token = request.cookies.get(SESSION_COOKIE_NAME)
     if not token:
         raise NotAuthenticatedException()
-    
+
     try:
         user_id = decode_session_token(token)
     except (BadSignature, SignatureExpired):
         raise NotAuthenticatedException()
-    
+
     user = await db.get(User, user_id)
     if user is None:
         raise NotAuthenticatedException()
-    
-    return user # It was User before; a stupid typo
+
+    return user  # It was User before; a stupid typo

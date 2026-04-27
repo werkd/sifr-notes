@@ -8,17 +8,15 @@ def parse_tags(raw: str) -> list[str]:
     - lowercase
     - drop empty string
     - deduplicate, preserving first-seen order
-    
     """
 
     seen = set()
     result = []
-    
+
     for token in raw.split(","):
         tag = token.strip().lower()
         if tag and tag not in seen:
             seen.add(tag)
             result.append(tag)
-    
-    return result
 
+    return result

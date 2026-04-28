@@ -25,6 +25,20 @@
             searching...
         </span>
 
+        {% if all_tags %}
+            <div class="tag-filter-strip">
+                {% if filter_tag %}
+                    <a href="/notes/" class="tag-pill tag-pill-active">X {{ filter_tag }}</a>
+                {% endif %}
+
+                {% for tag in all_tags %}
+                    {% if tag.name != filter_tag %}
+                        <a href="/tags/{{ tag.name }}" class="tag-pill">{{ tag.name }} </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <div id="notes-list" class="notes-grid">
             {% if notes %}
                 {% for note in notes %}

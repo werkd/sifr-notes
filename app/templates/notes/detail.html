@@ -12,19 +12,19 @@
         <div class="note-detail-meta">
             <span>created {{ note.created_at.strftime("%d %b %Y") }}</span>
             {% if note.updated_at != note.created_at %}
-                <span>· edited {{ note.created_at.strftime("%d %b %Y") }}</span>
+                <span>· edited {{ note.updated_at.strftime("%d %b %Y") }}</span>
             {% endif %}
 
             {% if note.tags %}
                 <div class="note-tags">
                     {% for tag in note.tags %}
-                        <span class="tag-pill"> {{ tag.name }} </span>
+                        <a href="/tags/{{ tag.name }}" class="tag-pill"> {{ tag.name }} </a>
                     {% endfor %}
                 </div>
             {% endif %}
         </div>
     </div>
-    
+
 
     <div class="note-detail-actions">
         <a href="/notes/{{ note.id }}/edit" class="btn btn-ghost">edit</a>
